@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include django_db_backups/templates *
+recursive-include django_db_backups/static *

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-db-backups"
+version = "0.1.0"
+description = "Robust Django database backup and restore utility with Dropbox integration."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "Your Name", email = "your.email@example.com"}]
+dependencies = [
+    "Django>=3.2",
+    "dropbox>=11.36.0",
+    "requests>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-django>=4.5",
+    "pytest-mock>=3.10",
+    "tox>=4.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["django_db_backups"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "testproject.settings"
+pythonpath = [".", "testproject"]
+python_files = ["test_*.py"]
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "django-environ>=0.11.2",
+    "psycopg[binary]>=3.2.13",
+    "twine>=6.1.0",
+]

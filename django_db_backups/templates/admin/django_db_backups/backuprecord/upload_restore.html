@@ -1,0 +1,228 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .restore-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background: var(--body-bg);
+        border: 1px solid var(--hairline-color);
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        padding: 25px;
+    }
+
+    .warning-box {
+        background: #fff4f2;
+        border-left: 6px solid #d32f2f;
+        padding: 18px;
+        margin-bottom: 25px;
+        border-radius: 4px;
+    }
+
+    .warning-box h3 {
+        margin: 0 0 10px 0;
+        color: #b71c1c;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .warning-box ul {
+        margin: 10px 0 0 18px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .file-input-wrapper {
+        border: 2px dashed #c4c4c4;
+        padding: 30px;
+        text-align: center;
+        background: #fafafa;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .file-input-wrapper:hover {
+        border-color: #417690;
+        background: #f3f9fc;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        margin-bottom: 10px;
+    }
+
+    .help-text {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .submit-btn {
+        background: #d32f2f;
+        color: #fff;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .submit-btn:hover {
+        background: #b71c1c;
+    }
+
+    .submit-btn:disabled {
+        background: #e57373;
+        cursor: not-allowed;
+    }
+
+    /* Loading Overlay */
+    #loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.9);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .spinner {
+        width: 45px;
+        height: 45px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #d32f2f;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .restore-container {
+            padding: 18px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("restore-form");
+    const fileInput = document.getElementById("backup_zip");
+    const overlay = document.getElementById("loading-overlay");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", function (e) {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            alert("Please select a backup file.");
+            return;
+        }
+
+        const file = fileInput.files[0];
+        if (!file.name.endsWith(".zip")) {
+            e.preventDefault();
+            alert("Only .zip files are allowed.");
+            return;
+        }
+
+        overlay.style.display = "flex";
+        submitBtn.disabled = true;
+        submitBtn.value = "Validating & Restoring...";
+    });
+});
+</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; 
+    <a href="{% url 'admin:app_list' app_label='django_db_backups' %}">
+        {% translate "Database Backups" %}
+    </a>
+    &rsaquo; 
+    {% translate "Upload & Restore" %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div style="font-size:16px;font-weight:600;">Validating Backup File…</div>
+        <div style="font-size:12px;color:#666;margin-top:5px;">
+            Please do not close this window.
+        </div>
+    </div>
+
+    <h1>{% translate "Upload & Restore Database Backup" %}</h1>
+
+    <div class="restore-container">
+
+        <div class="warning-box">
+            <h3>⚠ {% translate "Critical Warning: Data Overwrite" %}</h3>
+            <p>
+                <strong>{% translate "This operation is destructive." %}</strong>
+                {% translate "Restoring a backup will completely overwrite your current database." %}
+            </p>
+            <ul>
+                <li>{% translate "All data created after this backup will be permanently lost." %}</li>
+                <li>{% translate "All active sessions will be invalidated immediately." %}</li>
+                <li>{% translate "A safety snapshot of the current database will be created automatically before restoration." %}</li>
+            </ul>
+        </div>
+
+        <form id="restore-form" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="backup_zip">
+                    {% translate "Select Backup File (.zip)" %}
+                </label>
+
+                <div class="file-input-wrapper">
+                    <input 
+                        type="file"
+                        name="backup_zip"
+                        id="backup_zip"
+                        accept=".zip"
+                        required
+                    >
+                    <div class="help-text">
+                        {% translate "Only .zip files generated by this system are supported." %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-row" style="text-align:right;">
+                <input 
+                    type="submit"
+                    value="{% translate 'Validate & Restore' %}"
+                    class="submit-btn"
+                    id="submit-btn"
+                >
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
