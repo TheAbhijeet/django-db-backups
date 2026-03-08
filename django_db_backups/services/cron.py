@@ -4,7 +4,7 @@ import subprocess
 from django.conf import settings
 from django_db_backups.conf import get_setting
 
-CRON_COMMENT = "# django-cloud-db-backup-job"
+CRON_COMMENT = "# django-db-backups-backup-job"
 
 class CronManager:
     def __init__(self):

@@ -32,7 +32,7 @@ Use this package **at your own risk**. I am not responsible for any data loss, c
 
 1. Install the package:
 ```bash
-pip install django-cloud-db-backup
+pip install django-db-backups
 ```
 
 2. Add to your `INSTALLED_APPS` in `settings.py`:
