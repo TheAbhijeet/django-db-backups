@@ -43,17 +43,22 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["django_db_backups"]
 
+
+[tool.hatch.build]
+ignore-vcs = false   # respects .gitignore
+
 # 4. Source Distribution (sdist) Configuration: 
 # This explicitly EXCLUDES your test project and tests from the .tar.gz file
 [tool.hatch.build.targets.sdist]
 exclude = [
     "/testproject",
     "/tests",
+    "/backups",
     "/.github",
     "/.venv",
     "pytest.ini",
-    ".gitignore",
 ]
+
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "testproject.settings"
