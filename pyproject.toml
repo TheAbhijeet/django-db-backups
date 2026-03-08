@@ -27,8 +27,7 @@ dependencies = [
 ]
 
 [project.urls]
-# Optional: Add your GitHub repo here if you have one
-# Repository = "https://github.com/yourusername/django-cloud-db-backup"
+Repository = "https://github.com/TheAbhijeet/django-db-backups"
 
 [project.optional-dependencies]
 dev = [
@@ -64,5 +63,6 @@ python_files = ["test_*.py"]
 [dependency-groups]
 dev = [
     "build>=1.2.2.post1",
+    "django-environ>=0.11.2",
     "twine>=6.1.0",
 ]

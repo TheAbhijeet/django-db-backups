@@ -1,14 +1,3 @@
-⚠️ **Caution**
-
-This package is a **very minimal implementation** intended to solve a simple backup and restore workflow that works for my personal use case.
-
-Database backups and restores are a **complex and critical subject**, and different environments may require additional safeguards, validation, and testing. This package may **not be production-ready for every project**.
-
-Before using it in your project, please **review the code carefully, test it thoroughly, and ensure it meets your reliability and recovery requirements**.
-
-Use this package **at your own risk**. I am not responsible for any data loss, corruption, or other issues that may occur from its use.
-
-
 # Django Cloud DB Backup
 
 A database backup and restore utility for Django applications. It supports SQLite and PostgreSQL, with storage backends for the Local Filesystem and Dropbox.
@@ -21,6 +10,18 @@ A database backup and restore utility for Django applications. It supports SQLit
 *   **Docker Ready:** Can automatically execute database dumps inside a running Docker container from the host.
 *   **Chunked Uploads:** Safely uploads multi-gigabyte databases to Dropbox using chunked sessions to prevent memory exhaustion and timeouts.
 *   **Async Admin UI:** Upload and restore large backups in the background without browser timeouts.
+
+---
+
+⚠️ **Caution**
+
+This package is a **very minimal implementation** intended to solve a simple backup and restore workflow that works for my personal use case.
+
+Database backups and restores are a **complex and critical subject**, and different environments may require additional safeguards, validation, and testing. This package may **not be production-ready for every project**.
+
+Before using it in your project, please **review the code carefully, test it thoroughly, and ensure it meets your reliability and recovery requirements**.
+
+Use this package **at your own risk**. I am not responsible for any data loss, corruption, or other issues that may occur from its use.
 
 ---
 
