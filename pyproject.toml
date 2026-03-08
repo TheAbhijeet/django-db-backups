@@ -64,5 +64,6 @@ python_files = ["test_*.py"]
 dev = [
     "build>=1.2.2.post1",
     "django-environ>=0.11.2",
+    "psycopg[binary]>=3.2.13",
     "twine>=6.1.0",
 ]
