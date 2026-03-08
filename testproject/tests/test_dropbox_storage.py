@@ -8,7 +8,7 @@ from django_db_backups.services.dropbox_storage import DropboxStorage
 @pytest.fixture
 def dropbox_settings(settings):
     """Fixture to provide valid Dropbox settings for tests."""
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "DROPBOX_REFRESH_TOKEN": "test_token",
         "DROPBOX_APP_KEY": "test_key",
         "DROPBOX_APP_SECRET": "test_secret",
@@ -20,7 +20,7 @@ def dropbox_settings(settings):
 
 @pytest.mark.django_db
 def test_dropbox_storage_init_missing_config(settings):
-    settings.CLOUD_DB_BACKUP = {}
+    settings.DJANGO_DB_BACKUP = {}
     with pytest.raises(ValueError, match='Dropbox is not configured. Please set DROPBOX_APP_KEY, DROPBOX_APP_SECRET, and DROPBOX_REFRESH_TOKEN.'):
         DropboxStorage()
 
@@ -28,7 +28,7 @@ def test_dropbox_storage_init_missing_config(settings):
 @pytest.mark.django_db
 @patch("django_db_backups.services.dropbox_storage.dropbox.Dropbox")
 def test_dropbox_storage_uses_refresh_token(mock_dropbox, settings):
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "DROPBOX_APP_KEY": "key",
         "DROPBOX_APP_SECRET": "sec",
         "DROPBOX_REFRESH_TOKEN": "ref",

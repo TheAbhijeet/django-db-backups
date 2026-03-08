@@ -58,7 +58,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("\nSUCCESS! Here is your configuration for settings.py:\n"))
             
             config_block = (
-                f"CLOUD_DB_BACKUP = {{\n"
+                f"DJANGO_DB_BACKUP = {{\n"
                 f"    'BACKUP_DIR': BASE_DIR / 'backups',\n"
                 f"    'DROPBOX_APP_KEY': '{app_key}',\n"
                 f"    'DROPBOX_APP_SECRET': '{app_secret}',\n"

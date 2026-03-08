@@ -31,7 +31,7 @@ DEFAULTS: dict[str, Any] = {
 }
 
 def get_setting(key: str):
-    user_config = getattr(settings, "CLOUD_DB_BACKUP", {})
+    user_config = getattr(settings, "DJANGO_DB_BACKUP", {})
     val = user_config.get(key, DEFAULTS.get(key))
     
     if key == "BACKUP_DIR" and not val:

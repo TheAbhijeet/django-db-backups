@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-db-backups" 
-version = "0.1.1"
+version = "0.1.2"
 description = "A simple database backup/restore for Django (Postgres/SQLite + Dropbox)"
 readme = "README.md"
 requires-python = ">=3.8"

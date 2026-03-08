@@ -4,7 +4,7 @@ from django_db_backups.services.cron import CronManager, CRON_COMMENT
 
 @patch('django_db_backups.services.cron.subprocess.run')
 def test_update_cron_adds_job(mock_run, settings):
-    settings.CLOUD_DB_BACKUP = {"AUTO_BACKUP_INTERVAL_DAYS": 7}
+    settings.DJANGO_DB_BACKUP = {"AUTO_BACKUP_INTERVAL_DAYS": 7}
     
     # Mock reading existing crontab (empty)
     mock_run.return_value = MagicMock(returncode=0, stdout="")
@@ -23,7 +23,7 @@ def test_update_cron_adds_job(mock_run, settings):
 
 @patch('django_db_backups.services.cron.subprocess.run')
 def test_update_cron_removes_if_disabled(mock_run, settings):
-    settings.CLOUD_DB_BACKUP = {"AUTO_BACKUP_INTERVAL_DAYS": 0}
+    settings.DJANGO_DB_BACKUP = {"AUTO_BACKUP_INTERVAL_DAYS": 0}
     
     # Mock existing crontab with our job
     existing_cron = f"0 3 * * * python manage.py dbbackup {CRON_COMMENT}\n"

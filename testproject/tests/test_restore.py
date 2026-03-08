@@ -28,7 +28,7 @@ def create_fake_backup_zip(path: Path, db_type="sqlite", content=b"dummy", metad
 
 @pytest.mark.django_db
 def test_perform_restore_fails_on_checksum_mismatch(tmp_path, settings):
-    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"BACKUP_DIR": tmp_path}
     vendor = connection.vendor
     
     zip_path = tmp_path / "audit_failure.zip"
@@ -47,7 +47,7 @@ def test_perform_restore_fails_on_checksum_mismatch(tmp_path, settings):
 @patch('django_db_backups.services.restore.connection')
 def test_perform_restore_fails_on_pg_version_mismatch(mock_connection, tmp_path: Path, settings):
     """Ensures restore aborts if target PG is older than source."""
-    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"BACKUP_DIR": tmp_path}
     mock_connection.vendor = 'postgresql'
     
     mock_cursor = MagicMock()
@@ -95,7 +95,7 @@ def test_perform_restore_db_mismatch(tmp_path: Path):
 @patch('django_db_backups.services.restore.perform_backup')
 @patch('django_db_backups.services.restore.shutil.move') # Mock move so we don't destroy the test DB
 def test_perform_restore_sqlite_orchestration(mock_shutil_move, mock_perform_backup, tmp_path: Path, settings):
-    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"BACKUP_DIR": tmp_path}
     
     # We use valid SQL so executescript doesn't crash
     valid_sql = b"CREATE TABLE IF NOT EXISTS test_orch (id INTEGER PRIMARY KEY);"
@@ -120,7 +120,7 @@ def test_perform_restore_sqlite_orchestration(mock_shutil_move, mock_perform_bac
 @patch('django_db_backups.services.restore.perform_backup')
 @patch('django_db_backups.services.restore.shutil.move')
 def test_perform_restore_creates_audit_record_success(mock_shutil_move, mock_perform_backup, tmp_path, settings):
-    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"BACKUP_DIR": tmp_path}
     
     valid_sql = b"CREATE TABLE IF NOT EXISTS audit_success (id int);"
     zip_path = tmp_path / "audit_success.zip"
@@ -148,7 +148,7 @@ def test_perform_restore_creates_audit_record_failure(mock_subprocess, mock_perf
     """
     Non-Happy Path: Validation fails, record is marked failed, logs contain error.
     """
-    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"BACKUP_DIR": tmp_path}
     
     vendor = connection.vendor
 

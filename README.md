@@ -52,7 +52,7 @@ python manage.py migrate
 
 ## Configuration Scenarios
 
-Add the `CLOUD_DB_BACKUP` dictionary to your `settings.py`. Below are the three most common configurations.
+Add the `DJANGO_DB_BACKUP` dictionary to your `settings.py`. Below are the three most common configurations.
 
 ### Scenario 1: SQLite Only (Local Storage)
 This is the simplest setup. It requires no external dependencies.
@@ -63,7 +63,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
     "STORAGE": "local",
     "BACKUP_DIR": BASE_DIR / "backups",
     "RETENTION_MAX_COUNT": 5,         # Keep the last 5 backups
@@ -76,7 +76,7 @@ CLOUD_DB_BACKUP = {
 This requires the PostgreSQL client tools to be installed on your server (see the Binary Paths section below).
 
 ```python
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
     "STORAGE": "local",
     "BACKUP_DIR": BASE_DIR / "backups",
     "RETENTION_MAX_COUNT": 10,
@@ -91,7 +91,7 @@ This is the recommended production setup. It creates the backup locally, uploads
 ```python
 import os
 
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
     "STORAGE": "dropbox",
     "BACKUP_DIR": BASE_DIR / "backups", # Used temporarily during the upload process
     "DATABASES": ["default"],
@@ -123,7 +123,7 @@ The package can automatically manage the OS crontab for you.
 
 1.  Set the interval in `settings.py`:
     ```python
-    CLOUD_DB_BACKUP = {
+    DJANGO_DB_BACKUP = {
         "AUTO_BACKUP_INTERVAL_DAYS": 7, # Backup every 7 days
     }
     ```
@@ -157,7 +157,7 @@ sudo apt-get install postgresql-client
 ### 2. Django on Host, Postgres in Docker (Local Development)
 If you are developing on Windows or Mac, and your database runs inside a Docker container, you do not need to install PostgreSQL on your host machine. Tell the package your container's name, and it will route commands through `docker exec`.
 ```python
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
     # ...
     "POSTGRES_CONTAINER_NAME": "my_postgres_container", 
 }
@@ -166,7 +166,7 @@ CLOUD_DB_BACKUP = {
 ### 3. Custom Installation Paths (Windows)
 PostgreSQL is typically installed in Program Files. You must use raw strings (r"...") to handle backslashes.
 ```python
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
     # ...
     # Adjust the version number (16) to match your installation
     "PG_DUMP_PATH": r"C:\Program Files\PostgreSQL\16\bin\pg_dump.exe",
@@ -178,7 +178,7 @@ CLOUD_DB_BACKUP = {
 If you installed via apt, the binaries are usually in /usr/bin/ or /usr/lib/postgresql/.
 
 ```python
-CLOUD_DB_BACKUP = {
+DJANGO_DB_BACKUP = {
    # ...
     # Standard location for apt-installed postgresql-client
     "PG_DUMP_PATH": "/usr/bin/pg_dump",
@@ -242,7 +242,7 @@ This project uses `uv` for fast, reliable dependency management and virtual envi
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd django_cloud_db_backup
+cd django_DJANGO_DB_BACKUP
 
 # Create a virtual environment and sync dependencies using uv
 uv venv
@@ -285,9 +285,6 @@ Visit `http://127.0.0.1:8000/admin/` to test the UI.
 To release a new version to PyPI:
 
 ```bash
-# Ensure build tools are installed
-uv add --dev build twine
-
 # Build the source distribution and wheel
 uv run python -m build
 

@@ -12,7 +12,7 @@ from django_db_backups.services.backup import perform_backup
 @pytest.mark.django_db
 @patch('django_db_backups.services.backup.subprocess.run')
 def test_perform_backup_local_storage(mock_subprocess, settings, tmp_path: Path):
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "STORAGE": "local", 
         "BACKUP_DIR": tmp_path
     }
@@ -43,7 +43,7 @@ def test_perform_backup_local_storage(mock_subprocess, settings, tmp_path: Path)
 @pytest.mark.django_db
 @patch('django_db_backups.services.backup.subprocess.run')
 def test_perform_backup_cleans_up_on_failure(mock_subprocess, settings, tmp_path: Path):
-    settings.CLOUD_DB_BACKUP = {"STORAGE": "local", "BACKUP_DIR": tmp_path}
+    settings.DJANGO_DB_BACKUP = {"STORAGE": "local", "BACKUP_DIR": tmp_path}
     
     mock_subprocess.side_effect = Exception("Simulated subprocess crash")
     
@@ -76,7 +76,7 @@ def test_perform_backup_postgresql_success(mock_subprocess, mock_connection, set
         'PASSWORD': 'supersecretpassword',
         'HOST': '127.0.0.1',
     }
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "STORAGE": "local", 
         "BACKUP_DIR": tmp_path,
         "DATABASES": ["default"],
@@ -108,7 +108,7 @@ def test_perform_backup_postgresql_success(mock_subprocess, mock_connection, set
 @patch('django_db_backups.services.dropbox_storage.DropboxStorage') 
 @patch('django_db_backups.services.backup.enforce_retention_policy')
 def test_perform_backup_default_db_success(mock_enforce, mock_storage_class, mock_subprocess, settings, tmp_path: Path):
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "STORAGE": "dropbox", 
         "BACKUP_DIR": tmp_path,
         "DROPBOX_ACCESS_TOKEN": "test_token", 
@@ -136,7 +136,7 @@ def test_perform_backup_default_db_success(mock_enforce, mock_storage_class, moc
 @patch('django_db_backups.services.dropbox_storage.DropboxStorage') # FIX
 @patch('django_db_backups.services.backup.enforce_retention_policy')
 def test_perform_backup_sqlite_success(mock_enforce, mock_storage_class, mock_subprocess, settings, tmp_path: Path):
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "STORAGE": "dropbox", 
         "BACKUP_DIR": tmp_path,
         "DROPBOX_ACCESS_TOKEN": "test_token", 

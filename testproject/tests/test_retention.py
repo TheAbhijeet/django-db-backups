@@ -15,7 +15,7 @@ from django_db_backups.models import BackupRecord, RestoreRecord
 @patch('django_db_backups.services.retention.DropboxStorage')
 def test_enforce_retention_policy_deletes_oldest(mock_storage_class, settings):
     # Use new setting name
-    settings.CLOUD_DB_BACKUP = {"DROPBOX_RETENTION_MAX_COUNT": 2, "DROPBOX_ACCESS_TOKEN": "token"}
+    settings.DJANGO_DB_BACKUP = {"DROPBOX_RETENTION_MAX_COUNT": 2, "DROPBOX_ACCESS_TOKEN": "token"}
     mock_storage = MagicMock()
     mock_storage_class.return_value = mock_storage
     
@@ -35,7 +35,7 @@ def test_enforce_retention_policy_deletes_oldest(mock_storage_class, settings):
     
 @patch('django_db_backups.services.retention.DropboxStorage')
 def test_enforce_retention_policy_under_limit(mock_storage_class, settings):
-    settings.CLOUD_DB_BACKUP = {"MAX_KEEP": 5, "DROPBOX_TOKEN": "token"}
+    settings.DJANGO_DB_BACKUP = {"MAX_KEEP": 5, "DROPBOX_TOKEN": "token"}
     mock_storage = MagicMock()
     mock_storage_class.return_value = mock_storage
     
@@ -50,7 +50,7 @@ def test_enforce_retention_policy_under_limit(mock_storage_class, settings):
 @pytest.mark.django_db
 def test_enforce_local_retention_policy(tmp_path, settings):
     # Use new setting names
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "RETENTION_MAX_COUNT": 2, 
         "RETENTION_MAX_AGE_DAYS": 30,
         "BACKUP_DIR": tmp_path
@@ -72,7 +72,7 @@ def test_enforce_local_retention_policy(tmp_path, settings):
 @pytest.mark.django_db
 def test_local_retention_by_age(tmp_path: Path, settings):
     """Ensures files older than RETENTION_MAX_AGE_DAYS are deleted, even if count is low."""
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "BACKUP_DIR": tmp_path,
         "RETENTION_MAX_COUNT": 100,  # High count so it doesn't trigger
         "RETENTION_MAX_AGE_DAYS": 30, # Age limit
@@ -98,7 +98,7 @@ def test_local_retention_by_age(tmp_path: Path, settings):
 @pytest.mark.django_db
 def test_clean_database_records(settings):
     """Ensures old BackupRecord and RestoreRecord rows are purged."""
-    settings.CLOUD_DB_BACKUP = {
+    settings.DJANGO_DB_BACKUP = {
         "OPERATION_STATUS_RETENTION_DAYS": 7,
     }
     
