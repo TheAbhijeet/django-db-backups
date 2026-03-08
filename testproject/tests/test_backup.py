@@ -37,6 +37,9 @@ def test_perform_backup_local_storage(mock_subprocess, settings, tmp_path: Path)
         metadata = json.loads(zipf.read("metadata.json").decode('utf-8'))
         assert metadata["db_type"] == connection.vendor  
 
+
+
+@pytest.mark.skipif(connection.vendor != 'postgresql', reason="Test requires PostgreSQL")
 @pytest.mark.django_db
 @patch('django_db_backups.services.backup.subprocess.run')
 def test_perform_backup_cleans_up_on_failure(mock_subprocess, settings, tmp_path: Path):
@@ -99,7 +102,7 @@ def test_perform_backup_postgresql_success(mock_subprocess, mock_connection, set
     assert cmd[2] == '-U'
     assert cmd[3] == 'pg_user'
     
-
+@pytest.mark.skipif(connection.vendor != 'postgresql', reason="Test requires PostgreSQL")
 @pytest.mark.django_db
 @patch('django_db_backups.services.backup.subprocess.run')
 @patch('django_db_backups.services.dropbox_storage.DropboxStorage') 

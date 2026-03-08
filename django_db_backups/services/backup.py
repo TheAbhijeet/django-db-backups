@@ -17,11 +17,15 @@ from django.db import connections
 logger = logging.getLogger(__name__)
 
 
+def get_sqlite_dump(connection):
+    """Helper to get iterator for sqlite dump. Makes testing easier."""
+    return connection.iterdump()
+
 
 def perform_backup(local_only=False):
     logger.info("Starting database backup...")
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_dir = get_setting("BACKUP_DIR")
+    backup_dir = Path(get_setting("BACKUP_DIR"))
     backup_dir.mkdir(parents=True, exist_ok=True)
     
     db_aliases = get_setting("DATABASES")
@@ -46,10 +50,11 @@ def perform_backup(local_only=False):
                 raw_connection = conn.connection 
                 
                 with target_file.open('w', encoding='utf-8') as f:
-                    for line in raw_connection.iterdump():
+                    # CHANGE HERE:
+                    for line in get_sqlite_dump(raw_connection):
                         f.write(f'{line}\n')
                 logger.info(f"Successfully dumped SQLite DB using iterdump: {target_file.name}")
-                
+
             elif vendor == 'postgresql':
                 target_file = backup_dir / f"backup_{alias}_{timestamp}.dump"
                 

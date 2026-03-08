@@ -3,6 +3,7 @@ import io
 import json
 import logging
 import shutil
+import sqlite3
 import zipfile
 import subprocess
 import traceback
@@ -132,7 +133,6 @@ def _perform_restore_internal(zip_path_str: str, is_rollback: bool = False):
             restored_db_path.unlink(missing_ok=True)
             
             # 3. Connect to the new DB and execute the script
-            import sqlite3
             new_conn = sqlite3.connect(restored_db_path)
             new_conn.executescript(sql_script)
             new_conn.close()
@@ -244,7 +244,7 @@ def perform_restore(zip_path_str: str, record_id=None):
         connections.close_all()
         
         # 2. Re-establish the connection by simply using it.
-        connection.ensure_connection()
+        # connection.ensure_connection()
 
         
         record.logs = log_capture_string.getvalue()

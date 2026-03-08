@@ -352,3 +352,4 @@ backups/
 *--clean
 
 dist/
+*.restored
