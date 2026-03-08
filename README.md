@@ -2,6 +2,9 @@
 
 A database backup and restore utility for Django applications. It supports SQLite and PostgreSQL, with storage backends for the Local Filesystem and Dropbox.
 
+<img width="1473" height="344" alt="image" src="https://github.com/user-attachments/assets/535619cf-ec6d-471f-9749-4e74dcf56891" />
+
+
 ## Core Features
 
 *   **Atomic Restores:** Uses PostgreSQL single-transaction mode and automatic pre-restore safety snapshots to prevent data loss during failures.
