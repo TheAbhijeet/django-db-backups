@@ -66,5 +66,8 @@ jobs:
           DB_PORT: 5432
           # Ensure we use the Dropbox settings fallback for tests
           DROPBOX_ACCESS_TOKEN: "dummy_token_for_ci"
+          DROPBOX_APP_KEY : "dummy_key_for_ci"
+          DROPBOX_APP_SECRET: "dummy_secret_for_ci"
+          DROPBOX_REFRESH_TOKEN: "dummy_token_for_ci"
         run: |
           uv run pytest -v

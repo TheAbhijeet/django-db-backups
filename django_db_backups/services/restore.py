@@ -118,7 +118,7 @@ def _perform_restore_internal(zip_path_str: str, is_rollback: bool = False):
             # 1. KILL CONNECTIONS (Critical for Postgres)
             terminate_postgres_connections(db_name)
         
-        # 2. Close OUR connection (FIXED: using conn instead of global connection)
+        # 2. Close connection
         connections.close_all()
         logger.info("All database connections closed. Starting restore process...")
 
