@@ -210,7 +210,7 @@ python manage.py dbrestore path/to/backup.zip
 
 ---
 
-## Dropbox Setup Guide (Refresh Token Flow)
+## Dropbox Setup Manual Guide (Refresh Token Flow)
 
 Dropbox access tokens expire after 4 hours. For automated backups, you must use a Refresh Token.
 

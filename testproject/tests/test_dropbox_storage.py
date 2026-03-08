@@ -134,7 +134,6 @@ def test_dropbox_chunked_upload_for_large_files(
     fake_file_content = b"0" * file_size
     fake_file_stream = io.BytesIO(fake_file_content)
 
-    # --- FIX: Correctly mock the context manager for 'open' ---
     mock_open = MagicMock()
     mock_open.return_value.__enter__.return_value = fake_file_stream
 

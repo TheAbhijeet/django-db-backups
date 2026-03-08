@@ -201,7 +201,6 @@ def test_perform_restore_postgres_orchestration(mock_get_setting, mock_connectio
     mock_cursor.fetchone.return_value = ('PostgreSQL 14.0', )
     mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
 
-    # --- FIX: Mock the REAL connection object in the registry ---
     # We don't replace the registry, we just modify the object it holds.
     real_conn = connections['default']
     # We use a context manager to patch the vendor attribute safely
