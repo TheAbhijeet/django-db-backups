@@ -3,18 +3,32 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "django-db-backups"
+name = "django-db-backups" 
 version = "0.1.0"
-description = "Robust Django database backup and restore utility with Dropbox integration."
+description = "A simple database backup/restore for Django (Postgres/SQLite + Dropbox)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
-authors = [{name = "Your Name", email = "your.email@example.com"}]
+authors = [{name = "Abhijeet Pal", email = "no.email@example.com"}]
+
+# 2. Classifiers: These help people find your package on PyPI
+classifiers = [
+    "Framework :: Django",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Archiving :: Backup",
+]
+
 dependencies = [
     "Django>=3.2",
     "dropbox>=11.36.0",
     "requests>=2.0.0"
 ]
+
+[project.urls]
+# Optional: Add your GitHub repo here if you have one
+# Repository = "https://github.com/yourusername/django-cloud-db-backup"
 
 [project.optional-dependencies]
 dev = [
@@ -22,10 +36,25 @@ dev = [
     "pytest-django>=4.5",
     "pytest-mock>=3.10",
     "tox>=4.0",
+    "build>=1.2.2",
+    "twine>=6.1.0",
 ]
 
+# 3. Wheel Configuration: This ensures ONLY the app code is packaged
 [tool.hatch.build.targets.wheel]
 packages = ["django_db_backups"]
+
+# 4. Source Distribution (sdist) Configuration: 
+# This explicitly EXCLUDES your test project and tests from the .tar.gz file
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/testproject",
+    "/tests",
+    "/.github",
+    "/.venv",
+    "pytest.ini",
+    ".gitignore",
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "testproject.settings"
@@ -35,7 +64,5 @@ python_files = ["test_*.py"]
 [dependency-groups]
 dev = [
     "build>=1.2.2.post1",
-    "django-environ>=0.11.2",
-    "psycopg[binary]>=3.2.13",
     "twine>=6.1.0",
 ]
