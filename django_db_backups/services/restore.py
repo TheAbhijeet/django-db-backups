@@ -4,6 +4,7 @@ import json
 import logging
 import shutil
 import sqlite3
+from typing import Optional
 import zipfile
 import subprocess
 import traceback
@@ -14,7 +15,8 @@ from django_db_backups.services.lock import RestoreLock
 from django_db_backups.conf import get_setting
 from django_db_backups.utils import calculate_sha256
 from django_db_backups.services.backup import perform_backup
-from django_db_backups.models import RestoreRecord
+from django_db_backups.models import BackupRecord, RestoreRecord
+from django.core import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,41 @@ def terminate_postgres_connections(db_name: str):
     with connection.cursor() as cursor:
         cursor.execute(kill_sql, [db_name])
         
+
+def _preserve_audit_history(backup_dir: Path) -> Optional[Path]:
+    """Serializes Backup and Restore records to a temporary JSON file."""
+    history_file = backup_dir / "audit_history_temp.json"
+    try:
+        logger.info("Preserving audit history before restore...")
+        backups = serializers.serialize('json', BackupRecord.objects.all())
+        restores = serializers.serialize('json', RestoreRecord.objects.all())
+        data = {"backups": backups, "restores": restores}
+        history_file.write_text(json.dumps(data))
+        return history_file
+    except Exception as e:
+        logger.error(f"Failed to preserve audit history: {e}")
+        return None
+
+def _restore_audit_history(history_file: Path):
+    """Deserializes records from JSON and saves them to the newly restored DB."""
+    if not history_file or not history_file.exists():
+        return
+    try:
+        logger.info("Restoring audit history to the new database...")
+        data = json.loads(history_file.read_text())
+        
+        # obj.save() handles both INSERT (if missing) and UPDATE (if exists) based on UUID
+        for obj in serializers.deserialize('json', data['backups']):
+            obj.save()
+        for obj in serializers.deserialize('json', data['restores']):
+            obj.save()
+            
+        logger.info("Audit history successfully restored.")
+    except Exception as e:
+        logger.error(f"Failed to restore audit history: {e}")
+    finally:
+        history_file.unlink(missing_ok=True)
+
 
 def safe_extract(zipf: zipfile.ZipFile, target_dir: Path) -> Path:
     for member in zipf.namelist():
@@ -222,8 +259,14 @@ def perform_restore(zip_path_str: str, record_id=None):
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+    
+    history_file = None
 
     try:
+        backup_dir = Path(get_setting("BACKUP_DIR"))
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        history_file = _preserve_audit_history(backup_dir)
+
         with RestoreLock():
             _perform_restore_internal(zip_path_str)
         
@@ -245,6 +288,10 @@ def perform_restore(zip_path_str: str, record_id=None):
         
         # 2. Re-establish the connection by simply using it.
         # connection.ensure_connection()
+        
+        if history_file:
+            _restore_audit_history(history_file)
+
 
         
         record.logs = log_capture_string.getvalue()

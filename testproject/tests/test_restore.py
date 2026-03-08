@@ -8,6 +8,7 @@ from django_db_backups.services.restore import perform_restore
 from django_db_backups.models import BackupRecord, RestoreRecord
 from django.db import connections 
 from django.db import connection
+from django_db_backups.services.restore import _preserve_audit_history, _restore_audit_history
 
 
 
@@ -249,3 +250,75 @@ def test_perform_restore_postgres_orchestration(mock_get_setting, mock_connectio
     cmd = args[0]
     assert cmd[0] == 'pg_restore'
     assert '--single-transaction' in cmd
+    
+    
+    
+@pytest.mark.django_db
+def test_audit_history_preservation(tmp_path):
+    """
+    Tests that Backup and Restore records are correctly serialized to JSON
+    and can be restored, simulating preservation across a database wipe.
+    """
+    # 1. Create some dummy records
+    b1 = BackupRecord.objects.create(db_type="sqlite", status="success", storage_location="local:1.zip")
+    r1 = RestoreRecord.objects.create(source="1.zip", status="success")
+    
+    assert BackupRecord.objects.count() == 1
+    assert RestoreRecord.objects.count() == 1
+    
+    # 2. Preserve the history to a file
+    history_file = _preserve_audit_history(tmp_path)
+    
+    assert history_file is not None
+    assert history_file.exists()
+    
+    # 3. Simulate a database wipe (Delete all records)
+    BackupRecord.objects.all().delete()
+    RestoreRecord.objects.all().delete()
+    
+    assert BackupRecord.objects.count() == 0
+    assert RestoreRecord.objects.count() == 0
+    
+    # 4. Restore the history from the file
+    _restore_audit_history(history_file)
+    
+    # 5. Verify records are back and match exactly
+    assert BackupRecord.objects.count() == 1
+    assert RestoreRecord.objects.count() == 1
+    
+    restored_b1 = BackupRecord.objects.first()
+    restored_r1 = RestoreRecord.objects.first()
+    
+    assert restored_b1.id == b1.id
+    assert restored_b1.storage_location == "local:1.zip"
+    assert restored_r1.id == r1.id
+    assert restored_r1.source == "1.zip"
+    
+    # Verify the temporary file was cleaned up
+    assert not history_file.exists()
+
+@pytest.mark.skipif(connection.vendor != 'sqlite', reason="Test requires SQLite")
+@pytest.mark.django_db(transaction=True)
+@patch('django_db_backups.services.restore.perform_backup')
+@patch('django_db_backups.services.restore.shutil.move')
+def test_perform_restore_integrates_history_preservation(mock_shutil_move, mock_perform_backup, tmp_path, settings):
+    """Ensures the full perform_restore pipeline calls the preservation logic."""
+    settings.CLOUD_DB_BACKUP = {"BACKUP_DIR": tmp_path}
+    
+    # Create a record that should be preserved
+    BackupRecord.objects.create(db_type="sqlite", status="success", storage_location="local:preserve_me.zip")
+    
+    valid_sql = b"CREATE TABLE IF NOT EXISTS audit_success (id int);"
+    zip_path = tmp_path / "audit_success.zip"
+    create_fake_backup_zip(zip_path, db_type="sqlite", content=valid_sql)
+    
+    mock_perform_backup.return_value = MagicMock(spec=BackupRecord, storage_location=f"local:{tmp_path}/safety.zip")
+    
+    # Run the restore
+    perform_restore(str(zip_path))
+    
+    # If preservation worked, the initial BackupRecord + the Safety Backup + the RestoreRecord should exist
+    assert BackupRecord.objects.count() >= 1
+    assert RestoreRecord.objects.count() == 1
+    assert "Preserving audit history before restore" in RestoreRecord.objects.first().logs
+    assert "Restoring audit history to the new database" in RestoreRecord.objects.first().logs

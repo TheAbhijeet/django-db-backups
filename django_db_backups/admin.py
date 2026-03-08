@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 @admin.register(RestoreRecord)
 class RestoreRecordAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'source', 'status')
-    readonly_fields = ('created_at', 'source', 'status', 'error_message', 'logs')
+    list_display = ('id', 'created_at', 'source', 'status')
+    readonly_fields = ('id', 'created_at', 'source', 'status', 'error_message', 'logs')
     list_filter = ('status', 'created_at')
 
     def has_add_permission(self, request):
@@ -31,8 +31,8 @@ class RestoreRecordAdmin(admin.ModelAdmin):
 
 @admin.register(BackupRecord)
 class BackupRecordAdmin(admin.ModelAdmin):
-    list_display = ('db_type', 'created_at', 'status', 'storage_location', 'size_bytes', 'admin_actions')
-    readonly_fields = ('db_type', 'created_at', 'status', 'storage_location', 'size_bytes', 'error_message')
+    list_display = ('id', 'db_type', 'created_at', 'status', 'storage_location', 'size_bytes', 'admin_actions')
+    readonly_fields = ('id', 'db_type', 'created_at', 'status', 'storage_location', 'size_bytes', 'error_message')
     
     def get_urls(self):
         urls = super().get_urls()
