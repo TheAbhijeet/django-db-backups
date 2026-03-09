@@ -1,4 +1,4 @@
-# Django Cloud DB Backup
+# Django DB Backup
 
 A database backup and restore utility for Django applications. It supports SQLite and PostgreSQL, with storage backends for the Local Filesystem and Dropbox.
 
@@ -64,7 +64,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DJANGO_DB_BACKUP = {
-    "STORAGE": "local",
     "BACKUP_DIR": BASE_DIR / "backups",
     "RETENTION_MAX_COUNT": 5,         # Keep the last 5 backups
     "RETENTION_MAX_AGE_DAYS": 30,     # Delete backups older than 30 days
@@ -77,7 +76,6 @@ This requires the PostgreSQL client tools to be installed on your server (see th
 
 ```python
 DJANGO_DB_BACKUP = {
-    "STORAGE": "local",
     "BACKUP_DIR": BASE_DIR / "backups",
     "RETENTION_MAX_COUNT": 10,
     "DATABASES": ["default"],         # List of database aliases to backup
@@ -92,7 +90,6 @@ This is the recommended production setup. It creates the backup locally, uploads
 import os
 
 DJANGO_DB_BACKUP = {
-    "STORAGE": "dropbox",
     "BACKUP_DIR": BASE_DIR / "backups", # Used temporarily during the upload process
     "DATABASES": ["default"],
     
@@ -213,11 +210,11 @@ python manage.py dbrestore path/to/backup.zip
 
 ---
 
-## Dropbox Setup Manual Guide (Refresh Token Flow)
+## Dropbox Setup: Manual Guide (Refresh Token Flow)
 
 Dropbox access tokens expire after 4 hours. For automated backups, you must use a Refresh Token.
 
-1. Go to the Dropbox App Console and create a new app.
+1. Go to the Dropbox App Console [https://www.dropbox.com/developers/apps] and create a new app.
 2. Grant the app `files.content.write` and `files.content.read` permissions.
 3. Get your App Key and App Secret.
 4. Generate an authorization code by visiting this URL in your browser (replace `YOUR_APP_KEY`):
