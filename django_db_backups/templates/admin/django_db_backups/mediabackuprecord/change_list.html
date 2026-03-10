@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="upload-restore-media/" class="button" style="background-color: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 11px;">
+            Upload & Restore Media
+        </a>
+    </li>
+    <li>
+        <a href="trigger-media-backup/?local=1" class="button" style="background-color: #79aec8; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 11px; margin-left: 10px;">
+            Local Media Backup
+        </a>
+    </li>
+    <li>
+        <a href="trigger-media-backup/" class="button" style="background-color: #417690; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 11px; margin-left: 10px;">
+            Cloud Media Backup
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}

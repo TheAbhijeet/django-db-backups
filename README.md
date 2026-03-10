@@ -231,6 +231,40 @@ Dropbox access tokens expire after 4 hours. For automated backups, you must use 
 
 ---
 
+
+##  Media Backups
+
+In addition to database backups, this package can safely backup and restore your entire `MEDIA_ROOT` directory. This is perfect for migrating a complete site (like a blog with uploaded images) to a new server.
+
+**Important:** Media backups are handled completely separately from database backups to prevent massive image folders from causing database timeouts.
+
+### 1. Media Management Commands (CLI)
+```bash
+# Create a zip backup of your MEDIA_ROOT
+python manage.py mediabackup
+
+# Force a local-only media backup (bypasses Dropbox)
+python manage.py mediabackup --local
+
+# Restore media from a specific zip file
+python manage.py mediarestore path/to/media_backup.zip
+```
+
+### 2. Media Admin Interface
+- **Navigate:** `Database Backups → Media Backup Logs`
+
+- **Trigger Backup:**  
+  Click **"Local Media Backup"** or **"Cloud Media Backup"** at the top right.
+
+- **Upload & Restore:**  
+  Click the **red button** to upload a media `.zip` file.
+
+> **Safety Note:**  
+> Restoring media will completely wipe your current `MEDIA_ROOT` and replace it with the contents of the zip file.  
+> The system automatically creates a safety backup of your current media before the wipe occurs.
+
+
+
 ## Local Development Guide (For Maintainers)
 
 This project uses `uv` for fast, reliable dependency management and virtual environments.
