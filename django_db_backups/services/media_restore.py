@@ -49,10 +49,20 @@ def _perform_media_restore_internal(zip_path_str: str, is_rollback: bool = False
             raise RuntimeError(f"Safety backup failed: {e}")
 
     try:
-        logger.info(f"Wiping current MEDIA_ROOT: {media_root}")
+        logger.info(f"Wiping contents of MEDIA_ROOT: {media_root}")
         if media_root.exists():
-            shutil.rmtree(media_root)
-        media_root.mkdir(parents=True, exist_ok=True)
+            # ---  Delete contents, not the mount point ---
+            for item in media_root.iterdir():
+                try:
+                    if item.is_file() or item.is_symlink():
+                        item.unlink()
+                    elif item.is_dir():
+                        shutil.rmtree(item)
+                except Exception as del_err:
+                    logger.warning(f"Could not delete {item}: {del_err}")
+        else:
+            media_root.mkdir(parents=True, exist_ok=True)
+
 
         logger.info("Extracting media files...")
         with zipfile.ZipFile(zip_path, 'r') as zipf:
